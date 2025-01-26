@@ -1,0 +1,35 @@
+INDICADORES
+-----------------------
+
+2.1 - Obesidade infantil (%)
+Percentual de crianças entre 0 e 5 anos classificadas com obesidade (relação peso x altura) sobre o total de crianças nesta faixa etária.
+
+FONTE: DataSUS/Relatórios públicos consolidados do SISVAN
+
+-----------------------
+
+2.2 - Baixo peso ao nascer (%)
+Percentual de crianças nascidas vivas com menos de 2.499 g sobre o total de nascidos vivos no município.
+
+FONTE: DataSUS/SINASC
+
+-----------------------
+
+2.3 - Desnutrição infantil (%)
+Percentual de crianças menores de 5 anos desnutridas sobre o total de crianças nesta faixa etária. Índice de Massa Corporal (Peso X Idade) < que o percentil 0,1.
+
+FONTE: SISVAN
+
+-----------------------
+
+2.4 - Produtores de agricultura familiar com apoio do PRONAF (%)
+Percentual da unidades agrícolas com financiamento PRONAF. As informações registradas nos Censos Agropecuários são declaratórias, prestadas pelo entrevistado no momento da visita.
+
+FONTE: IBGE/Censo Agropecuário 2017
+
+-----------------------
+
+2.5 - Estabelecimentos que praticam agricultura orgânica (%)
+Percentual de estabelecimentos agrícolas que praticam agricultura orgânica. As informações registradas nos Censos Agropecuários são declaratórias, prestadas pelo entrevistado no momento da visita.
+
+FONTE: IBGE/Censo Agropecuário 2017
