@@ -55,6 +55,7 @@ main_selectors = {
     'coUfIbge': [state, 'Group state filter'],
     'coMunicipioIbge': [city, 'Group city filter']
 }
+
 # Itering over the main selectors
 for selector, value in main_selectors.items():
     driver.execute_script(f"""
@@ -160,8 +161,8 @@ print(df.info())
 print(df.shape)
 
 # Optional: Close the new tab & switch back to main
+driver.switch_to.window(driver.window_handles[0]) # Back to main page
 driver.close()
-driver.switch_to.window(driver.window_handles[0])  # Back to main page
 
 print("Switched back to the main report page")
 
