@@ -5,6 +5,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
+from bs4 import BeautifulSoup
+import pandas as pd
+
 
 # Setting up the common search
 year = 2008 
@@ -31,7 +34,7 @@ driver = webdriver.Chrome(service=service)
 driver.get("https://sisaps.saude.gov.br/sisvan/relatoriopublico/index")
 
 # Establishing the waiting time for 10 secs
-wait = WebDriverWait(driver, 10)
+wait = WebDriverWait(driver, 20)
 
 
 target_div = wait.until(
@@ -52,7 +55,7 @@ main_selectors = {
     'coUfIbge': [state, 'Group state filter'],
     'coMunicipioIbge': [city, 'Group city filter']
 }
-
+# Itering over the main selectors
 for selector, value in main_selectors.items():
     driver.execute_script(f"""
         var elements = document.getElementsByName('{selector}');
@@ -65,30 +68,102 @@ for selector, value in main_selectors.items():
     
     # Refresh Bootstrap dropdown if necessary
     driver.execute_script(f"""
-        if ($('#{selector}').hasClass('selectpicker')) {{
-            $('#{selector}').selectpicker('refresh');
+        if ($('#arguments[0]').hasClass('selectpicker')) {{
+            $('#arguments[0]').selectpicker('refresh');
         }}
-    """)
+    """, selector)
 
     print(f"{selector} selected successfully via JavaScript\n {value[1]} {value[0]} selected.")
 
 age_group_selector = {
     'nu_ciclo_vida': [age_group, 'Age Group'],
-    'nu_intervalo_idade_inicio': [age_int_start, 'Age Interval Start'],
-    'nu_intervalo_idade_fim': [age_int_end, 'Age Interval End'],
-    'nu_indice_cri': []
+    'nu_idade_inicio': [age_int_start, 'Age Interval Start'],
+    'nu_idade_fim': [age_int_end, 'Age Interval End'],
+    'nu_indice_cri': [age_index, 'Index']
 }
 
-# Selecting the age group
-driver.execute_script('document.getElementsByName("nu_ciclo_vida")[0].scrollIntoView();')
 
+# Itering over the age group selectors
+for selector, value in age_group_selector.items():
 
-# PAREI AQUI. TALVEZ COLOCAR TUDO NO FOR E COLOCAR O DISPACH EVENT ALEM DO REFRESH
-driver.execute_script("""""")
-driver.execute_script('$("#nu_ciclo_vida").selectpicker("refresh");')
+    # Scroll the element into view and select the dropdown option
+    driver.execute_script(f"""
+        var elements = document.getElementsByName('{selector}');
+        if (elements.length > 0) {{
+            elements[0].scrollIntoView();
+        }}
+        if (elements.length > 0) {{
+            elements[0].value = '{value[0]}';
+            var event = new Event('change', {{ bubbles: true }});
+            elements[0].dispatchEvent(event);
+            }}
+    """)
 
-# Selecting the age interval
-#driver.execute_script()
+    if selector == 'nu_ciclo_vida':
+        wait.until(
+            EC.presence_of_element_located((By.NAME, 'nu_idade_inicio'))
+        )
+    elif selector == 'nu_idade_inicio':
+        wait.until(
+            EC.presence_of_element_located((By.NAME, 'nu_idade_fim'))
+        )
+
+    # Refresh Bootstrap dropdown if necessary
+    driver.execute_script(f"""
+        if ($('#arguments[0]').hasClass('selectpicker')) {{
+            $('#arguments[0]').selectpicker('refresh');
+        }}
+    """, selector)
+
+    print(f"{selector} selected successfully via JavaScript\n {value[1]} {value[0]} selected.")
+
+sleep(2)
+
+# Click on the search button
+
+target_button_table = wait.until(
+    EC.presence_of_element_located((By.CSS_SELECTOR, 'button#verTela'))
+)
+
+target_button_table.click()
+
+sleep(2)
+
+# Switching to the new window
+wait.until(lambda d: len(d.window_handles) > 1)
+driver.switch_to.window(driver.window_handles[1])
+
+print("Switched to the HTML table's tab")
+
+table = wait.until(
+    EC.presence_of_element_located((By.CSS_SELECTOR, 'table'))
+)
+
+table_html = table.get_attribute('outerHTML')
+
+soup = BeautifulSoup(table_html, 'html.parser')
+
+print("Table HTML retrieved successfully")
+
+table = soup.find('table')
+
+df = pd.read_html(str(table))[0]
+
+#Flattening the columns
+df.columns = ['_'.join(col).strip() for col in df.columns]
+
+# saving the df_teste_2 to a csv file
+df.to_csv('Python/ods_2_1_teste_2.csv', index=False, sep=';', encoding='utf-8')
+
+print(df.head())
+print(df.info())
+print(df.shape)
+
+# Optional: Close the new tab & switch back to main
+driver.close()
+driver.switch_to.window(driver.window_handles[0])  # Back to main page
+
+print("Switched back to the main report page")
 
 sleep(5)
 
